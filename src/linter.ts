@@ -663,8 +663,10 @@ export default class ShellCheckProvider implements vscode.CodeActionProvider {
     const allResults: ParseResult[] = [];
     const executable = settings.executable;
 
+    // GitHub Actions run: steps execute from the repo root by default,
+    // so always use workspace root for workflow files to resolve sourced files correctly.
     let cwd: string | undefined;
-    if (settings.useWorkspaceRootAsCwd) {
+    if (settings.useWorkspaceRootAsCwd || isGitHubWorkflowFile(textDocument)) {
       cwd = getWorkspaceFolderPath(textDocument.uri);
     } else {
       cwd = guessDocumentDirname(textDocument);
